@@ -1,0 +1,29 @@
+# Build directories
+build/
+out/
+cmake-build-*/
+
+# Compiled objects / binaries
+*.o
+*.obj
+*.so
+*.a
+*.cubin
+*.ptx
+*.fatbin
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+.cache/
+compile_commands.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Misc
+*.log
+.DS_Store
