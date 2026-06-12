@@ -24,12 +24,22 @@ blackhole/
 │   ├── common/             # Shared utilities (arch traits, tiling, types)
 │   ├── sm100/              # sm_100 operator headers
 │   └── sm120/              # sm_120 operator headers
+│       └── nvfp4_gemm.hpp  # NVFP4 x NVFP4 -> BF16 block-scaled GEMM
+├── example/                # Runnable examples (see example/README.md)
+│   └── nvfp4_bf16_gemm.cu  # end-to-end test + benchmark for the kernel above
 ├── CMakeLists.txt          # header-only blackhole::blackhole target
 └── third_party/
     └── cutlass/            # CUTLASS/CuTe (git submodule)
 ```
 
-Tests, benchmarks and examples are intentionally omitted; add them when needed.
+## Operators
+
+| Arch     | Operator                              | Header                              |
+| -------- | ------------------------------------- | ----------------------------------- |
+| `sm_120` | NVFP4 × NVFP4 → BF16 block-scaled GEMM | `include/blackhole/sm120/nvfp4_gemm.hpp` |
+
+See [`example/README.md`](example/README.md) for how to build, run, and profile
+the NVFP4 GEMM (including measuring Tensor Core utilization with `ncu`).
 
 ## Getting started
 
