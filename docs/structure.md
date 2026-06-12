@@ -24,12 +24,9 @@ should go.
 | `include/blackhole/common/`   | Arch traits, type helpers, tiling/scheduling utils   |
 | `include/blackhole/sm100/`    | `sm_100` operator headers (gemm, attention, …)       |
 | `include/blackhole/sm120/`    | `sm_120` operator headers                            |
-| `src/<arch>/`                 | Optional `.cu` TUs / explicit template instantiations|
 | `tests/<arch>/`               | Correctness tests (vs. reference)                    |
 | `benchmarks/<arch>/`          | Performance benchmarks                               |
 | `examples/`                   | Minimal standalone usage examples                    |
-| `cmake/`                      | Reusable CMake helper modules                        |
-| `scripts/`                    | Build / profiling / codegen helpers                  |
 | `third_party/cutlass/`        | CUTLASS + CuTe (git submodule)                       |
 
 ## Include convention

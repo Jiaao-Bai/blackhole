@@ -24,9 +24,6 @@ blackhole/
 │   ├── common/             # Shared utilities (arch traits, tiling, types)
 │   ├── sm100/              # sm_100 operator headers
 │   └── sm120/              # sm_120 operator headers
-├── src/                    # Optional .cu translation units / explicit insts
-│   ├── sm100/
-│   └── sm120/
 ├── tests/                  # Correctness tests (per arch)
 │   ├── sm100/
 │   └── sm120/
@@ -34,8 +31,6 @@ blackhole/
 │   ├── sm100/
 │   └── sm120/
 ├── examples/               # Minimal standalone usage examples
-├── cmake/                  # CMake helper modules
-├── scripts/                # Build / profiling / codegen helpers
 ├── docs/                   # Design notes and documentation
 └── third_party/
     └── cutlass/            # CUTLASS/CuTe (git submodule)
