@@ -24,17 +24,12 @@ blackhole/
 │   ├── common/             # Shared utilities (arch traits, tiling, types)
 │   ├── sm100/              # sm_100 operator headers
 │   └── sm120/              # sm_120 operator headers
-├── tests/                  # Correctness tests (per arch)
-│   ├── sm100/
-│   └── sm120/
-├── benchmarks/             # Performance benchmarks (per arch)
-│   ├── sm100/
-│   └── sm120/
-├── examples/               # Minimal standalone usage examples
-├── docs/                   # Design notes and documentation
+├── CMakeLists.txt          # header-only blackhole::blackhole target
 └── third_party/
     └── cutlass/            # CUTLASS/CuTe (git submodule)
 ```
+
+Tests, benchmarks and examples are intentionally omitted; add them when needed.
 
 ## Getting started
 

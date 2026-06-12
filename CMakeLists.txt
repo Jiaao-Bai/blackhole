@@ -5,27 +5,14 @@ project(blackhole LANGUAGES CXX CUDA)
 # ---------------------------------------------------------------------------
 # Options
 # ---------------------------------------------------------------------------
-option(BLACKHOLE_SM100      "Build sm_100 (datacenter Blackwell) kernels" ON)
-option(BLACKHOLE_SM120      "Build sm_120 (consumer Blackwell) kernels"   ON)
-option(BLACKHOLE_BUILD_TESTS      "Build correctness tests" ON)
-option(BLACKHOLE_BUILD_BENCHMARKS "Build benchmarks"        ON)
-option(BLACKHOLE_BUILD_EXAMPLES   "Build examples"          ON)
+option(BLACKHOLE_SM100 "Target sm_100 (datacenter Blackwell)" ON)
+option(BLACKHOLE_SM120 "Target sm_120 (consumer Blackwell)"   ON)
 
-# ---------------------------------------------------------------------------
-# Standards
-# ---------------------------------------------------------------------------
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
-endif()
-
-# ---------------------------------------------------------------------------
-# CUDA architectures
-# ---------------------------------------------------------------------------
 set(BLACKHOLE_CUDA_ARCHS "")
 if(BLACKHOLE_SM100)
   list(APPEND BLACKHOLE_CUDA_ARCHS 100a)
@@ -47,31 +34,13 @@ if(NOT EXISTS ${CUTLASS_DIR}/include/cute/tensor.hpp)
     "CUTLASS submodule not found. Run: git submodule update --init --recursive")
 endif()
 
-add_library(cutlass_cute INTERFACE)
-target_include_directories(cutlass_cute INTERFACE
-  ${CUTLASS_DIR}/include
-  ${CUTLASS_DIR}/tools/util/include)
-target_compile_features(cutlass_cute INTERFACE cxx_std_17)
-
 # ---------------------------------------------------------------------------
-# blackhole interface (header-only public API)
+# blackhole: header-only public API
 # ---------------------------------------------------------------------------
 add_library(blackhole INTERFACE)
 add_library(blackhole::blackhole ALIAS blackhole)
 target_include_directories(blackhole INTERFACE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(blackhole INTERFACE cutlass_cute)
-
-# ---------------------------------------------------------------------------
-# Subdirectories
-# ---------------------------------------------------------------------------
-if(BLACKHOLE_BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(tests)
-endif()
-if(BLACKHOLE_BUILD_BENCHMARKS)
-  add_subdirectory(benchmarks)
-endif()
-if(BLACKHOLE_BUILD_EXAMPLES)
-  add_subdirectory(examples)
-endif()
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CUTLASS_DIR}/include
+  ${CUTLASS_DIR}/tools/util/include)
+target_compile_features(blackhole INTERFACE cxx_std_17)
