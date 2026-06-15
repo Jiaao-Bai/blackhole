@@ -324,11 +324,11 @@ struct Nvfp4GemmParams {
       typename KT::SmemLayoutB{}(_, _, Int<0>{})));
   using TmaSFA = decltype(make_tma_copy(
       SM90_TMA_LOAD{},
-      make_tensor((typename KT::ElementSF const*)nullptr, LayoutSFAGmem{}),
+      make_tensor(recast_ptr<uint8_t>((typename KT::ElementSF const*)nullptr), LayoutSFAGmem{}),
       typename KT::SmemLayoutSFA{}(_, _, Int<0>{})));
   using TmaSFB = decltype(make_tma_copy(
       SM90_TMA_LOAD{},
-      make_tensor((typename KT::ElementSF const*)nullptr, LayoutSFBGmem{}),
+      make_tensor(recast_ptr<uint8_t>((typename KT::ElementSF const*)nullptr), LayoutSFBGmem{}),
       typename KT::SmemLayoutSFB{}(_, _, Int<0>{})));
   using TmaD = decltype(make_tma_copy(
       SM90_TMA_STORE{},
@@ -395,10 +395,10 @@ nvfp4_gemm_kernel(const __grid_constant__ Nvfp4GemmParams<KT> params) {
   Tensor mSFB = params.tma_sfb.get_tma_tensor(shape(params.layout_sfb));
 
   auto cta_tiler = typename KT::TileShape{};
-  Tensor gA   = local_tile(mA,   cta_tiler, make_coord(m_coord, _, _), Step<_1, X, _1>{})(_, _, 0, _);  // (TileM,TileK,k)
-  Tensor gB   = local_tile(mB,   cta_tiler, make_coord(_, n_coord, _), Step<X, _1, _1>{})(_, _, 0, _);  // (TileN,TileK,k)
-  Tensor gSFA = local_tile(mSFA, cta_tiler, make_coord(m_coord, _, _), Step<_1, X, _1>{})(_, _, 0, _);
-  Tensor gSFB = local_tile(mSFB, cta_tiler, make_coord(_, n_coord, _), Step<X, _1, _1>{})(_, _, 0, _);
+  Tensor gA   = local_tile(mA,   cta_tiler, make_coord(m_coord, _, _), Step<_1, X, _1>{});  // (TileM,TileK,k)
+  Tensor gB   = local_tile(mB,   cta_tiler, make_coord(_, n_coord, _), Step<X, _1, _1>{});  // (TileN,TileK,k)
+  Tensor gSFA = local_tile(mSFA, cta_tiler, make_coord(m_coord, _, _), Step<_1, X, _1>{});
+  Tensor gSFB = local_tile(mSFB, cta_tiler, make_coord(_, n_coord, _), Step<X, _1, _1>{});
 
   Tensor sA   = make_tensor(make_smem_ptr(smem.tensors.mainloop.A.begin()),   typename KT::SmemLayoutA{});
   Tensor sB   = make_tensor(make_smem_ptr(smem.tensors.mainloop.B.begin()),   typename KT::SmemLayoutB{});
@@ -603,8 +603,8 @@ inline cudaError_t nvfp4_bf16_gemm(int M, int N, int K,
                                 make_layout(make_shape(M, K), make_stride(K, _1{})));
   Tensor tensor_b = make_tensor(recast_ptr<KT::ElementB>(B_packed),
                                 make_layout(make_shape(N, K), make_stride(K, _1{})));
-  Tensor tensor_sfa = make_tensor(static_cast<KT::ElementSF const*>(SFA), layout_sfa);
-  Tensor tensor_sfb = make_tensor(static_cast<KT::ElementSF const*>(SFB), layout_sfb);
+  auto tensor_sfa = make_tensor(recast_ptr<uint8_t>(static_cast<KT::ElementSF const*>(SFA)), layout_sfa);
+  auto tensor_sfb = make_tensor(recast_ptr<uint8_t>(static_cast<KT::ElementSF const*>(SFB)), layout_sfb);
   Tensor tensor_d = make_tensor(static_cast<KT::ElementD*>(D),
                                 make_layout(make_shape(M, N), make_stride(N, _1{})));
 

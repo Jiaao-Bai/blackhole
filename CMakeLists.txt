@@ -44,3 +44,8 @@ target_include_directories(blackhole INTERFACE
   ${CUTLASS_DIR}/include
   ${CUTLASS_DIR}/tools/util/include)
 target_compile_features(blackhole INTERFACE cxx_std_17)
+
+# --- Example ---
+add_executable(nvfp4_bf16_gemm example/nvfp4_bf16_gemm.cu)
+target_link_libraries(nvfp4_bf16_gemm PRIVATE blackhole::blackhole)
+set_target_properties(nvfp4_bf16_gemm PROPERTIES CUDA_ARCHITECTURES "120a")

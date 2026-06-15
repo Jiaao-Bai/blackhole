@@ -12,6 +12,15 @@ cmake-build-*/
 *.ptx
 *.fatbin
 
+# CUDA intermediate / preprocessed files
+*.cudafe1.*
+*.cpp1.ii
+*.cpp2.ii
+*.cpp3.ii
+*.cpp4.ii
+*.module_id
+*.fatbin.c
+
 # Editor / IDE
 .vscode/
 .idea/
@@ -27,3 +36,6 @@ __pycache__/
 # Misc
 *.log
 .DS_Store
+
+
+.claude/

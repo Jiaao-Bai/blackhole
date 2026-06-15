@@ -7,6 +7,33 @@
 // 流程: 随机生成 NVFP4 输入 -> CPU 参考 -> 跑 blackhole kernel -> 比对 -> 计时报 TFLOPS。
 //
 // 编译 / 运行 / ncu 采样方法见同目录 README.md。
+//
+// ------------------------------- 实测数据 (2026-06-13) -------------------------------
+// 测试环境: GeForce RTX 5060 Ti (36 SMs, sm_120a), CUDA 13.1, Driver 595.71.05
+//
+// 正确性: 256 个随机抽样点, max_rel=0.0000, mismatches=0 -> PASSED (M=N=K=4096)
+//
+// 性能 (M=N=K=4096, iters=50 warmup+timed):
+//   实测: 281.6 TFLOP/s @ ~2.6 GHz SM clock
+//
+// 理论峰值 (RTX 5060 Ti NVFP4 dense, non-sparse):
+//   基于 GB202 170 SM / 1700 TFLOPS FP4 等比推算: 36 SM × 10 TFLOPS/SM ≈ 360 TFLOPS
+//   频率修正 (2.6/2.45 GHz): ≈ 382 TFLOPS
+//   MFU (实际频率): 73.8%
+//   MFU (绝对峰值): 62.1%  (max boost 3.09 GHz)
+//
+// NCU 核心指标 (ncu --set full, 第 2 次 launch):
+//   Tensor Pipeline (SM Busy):   68.5%   (最高利用率流水线, 由 Tensor (FP) 子流水线主导)
+//   SM Cycles Active:            97.12%  (SM 几乎一直有活干)
+//   DRAM Throughput:             16.3%   (远未跑满 -> 算力受限, 非带宽受限)
+//   Issue Slots Busy:            16.27%  (发射槽利用率偏低)
+//   Active Warps / Scheduler:    1.99 / 12  (低 occupancy, smem ~90KB/99KB 限制)
+//   Eligible Warps / Scheduler:  0.21    (低 eligible -> 延迟隐藏不足)
+//
+//   瓶颈分析: Occupancy 是主要制约——每个 SM 只能容纳 1 个 CTA (shared memory 峰值 ~90KB,
+//   上限 99KB)。这导致 scheduler 只有 ~2 个 active warp (上限 12), 无法充分隐藏 TMA
+//   和 scale factor 加载延迟。可调方向: 减少流水级数 Stages 或缩小 Tile 尺寸以降低
+//   smem 压力, 换取更高 occupancy。
 // =====================================================================================
 #include <cstdio>
 #include <cstdlib>
